@@ -3,25 +3,24 @@
 # parameters - the Hash containing parameters to the API call, may be empty but not nil
 
 function createUrlParameters($parameters=array()) {
-  // Get the parameters in order
+  
+  //Sort the paramters in alphabetical order
   $updatedParameters = array_merge(array(
     "ts" => time(),
-    "apisecret" => 'SAMPLE_SECRET_KEY',
-    "apikey" => 'SAMPLE_API_KEY'
+    "apisecret" => 'YOUR_SECRET_KEY',
+    "apikey" => 'YOUR_API_KEY'
   ), $parameters);
   ksort($updatedParameters);
     
-  // Now lets create the string for hashing.
-  // don't use http_build_query, because it not escaped for hashing.
-  // so instead, brute force it, will work for 1 level arrays
+  // Create the string for hashing. Do not use http_build_query, because hashing cannot be escaped.
   $sigParameterString = "";
   foreach ($updatedParameters as $key => $value) {
     $sigParameterString .= "&" . $key . "=" . $value;
   }
   $sigParameterString = substr($sigParameterString, 1);
     
-  // Now create the signature hash, add it to the parameter string
-  // Remove the apisecret from the parameters
+  // Now create the signature hash and add it to the parameter string.
+  // Also remove the apisecret from the parameters.
   $updatedParameters['sig'] = hash('sha256', $sigParameterString);
   unset($updatedParameters['apisecret']);
     
