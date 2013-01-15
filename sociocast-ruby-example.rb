@@ -14,8 +14,8 @@ require 'erb'
 # timestamp - number of seconds since the Unix Epoch at which the request was made
 # parameters - the Hash containing parameters to the API call, may be empty but not nil
 def calculate_hash(apikey, apisecret, timestamp, parameters)
-  # gather values included in hash, sort them alphabetically
-	sig_params = parameters.clone
+        # gather values included in hash, sort them alphabetically
+	sig_params = Hash.new
 	sig_params[:apikey] = apikey
 	sig_params[:apisecret] = apisecret
 	sig_params[:ts] = timestamp
@@ -23,7 +23,7 @@ def calculate_hash(apikey, apisecret, timestamp, parameters)
 	# stringify the values to be hashed - e.g. key1=value1&key2=value2&key3=value3
 	string_to_hash = ''
 	sig_params.sort.map do |key,value|
-		string_to_hash = string_to_hash + key.to_s + "=" + value.to_s + "&"
+	    string_to_hash = string_to_hash + key.to_s + "=" + value.to_s + "&"
 	end
 	string_to_hash = string_to_hash.chomp('&') # Ensuring that the last '&' is removed. Artifact introduced by this example code.
 	
