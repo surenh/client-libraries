@@ -1,30 +1,31 @@
-# Returns the SHA256 hash which is used to sign the API call
+# Returns the GET query string included the SHA256 hash which is used to sign the API call
 #
 # parameters - the Hash containing parameters to the API call, may be empty but not nil
 
-function createUrlParameters($parameters=array()) {
+function createGetRequestQueryString($parameters=array()) {
   
   //Sort the paramters in alphabetical order
-  $updatedParameters = array_merge(array(
-    "ts" => time(),
-    "apisecret" => 'YOUR_SECRET_KEY',
-    "apikey" => 'YOUR_API_KEY'
-  ), $parameters);
-  ksort($updatedParameters);
+  $sigParams = array(
+    "apikey" => 'YOUR-KEY',
+    "apisecret" => 'YOUR-SECRET',
+    "ts" => time()
+  );
+  ksort($sigParams); # can avoid sorting by keeping the params in order above but doing for safety
     
   // Create the string for hashing. Do not use http_build_query, because hashing cannot be escaped.
   $sigParameterString = "";
-  foreach ($updatedParameters as $key => $value) {
+  foreach ($sigParams as $key => $value) {
     $sigParameterString .= "&" . $key . "=" . $value;
   }
   $sigParameterString = substr($sigParameterString, 1);
     
   // Now create the signature hash and add it to the parameter string.
   // Also remove the apisecret from the parameters.
-  $updatedParameters['sig'] = hash('sha256', $sigParameterString);
-  unset($updatedParameters['apisecret']);
-    
-  // Return
-  return http_build_query($updatedParameters);
-}
+  $sigParams['sig'] = hash('sha256', $sigParameterString);
+  unset($sigParams['apisecret']);
 
+  $paramString = array_merge($sigParams, $parameters);
+  
+  // Return
+  return http_build_query($paramString);
+}
